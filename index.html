@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <!---Student Name: Lorenzo Laurel Reyes--->
+    <!---Class Batch: WD92P (ZetoRo)---------->
+    <!---Schedule: 7:00pm to 10:00pm---------->
+    <!---Instructor: Ma'am Jamie Delina------->
+    <!---Coordinator: Sir Ben De Leon--------->
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+        <title>Cinema Ticket Generator (Queue)</title>
+    
+        <style>
+            body {
+                font-family: 'Times New Roman', Times, serif;
+                background-color: #7a0707e0;
+                margin: 0;
+                padding: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                height: 100vh;
+            }
+            
+            .container {
+                text-align: center;
+                background-color: #4e0dc796;
+                padding: 20px;
+                border-radius: 10px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            }
+            
+            button {
+                margin-top: 10px;
+                padding: 10px;
+                cursor: pointer;
+                background-color: #3498db;
+                color: #fff;
+                border: none;
+                border-radius: 5px;
+                font-size: 16px;
+            }
+
+            button:hover {
+                background-color: #2980b9;
+            }
+            
+            #ticketContainer {
+                margin-top: 20px;
+                padding: 20px;
+                border: 1px solid #ddd;
+                border-radius: 10px;
+                background-color: #ecf0f1;
+            }
+
+            h1 {
+                color: #d0dce4;
+            }
+            
+            h2 {
+                color: #06314e;
+            }
+
+            p {
+                margin: 10px 0;
+            }
+
+            #ticketPrice {
+                margin-top: 10px;
+                font-weight: bold;
+                color: #27ae60;
+            }
+
+            /*---Curtain Opening Animation---*/
+            .curtain-opening {
+                animation: openCurtain 0.5s ease-out;
+            }
+            
+            @keyframes openCurtain {
+                0% {
+                    height: 100%;
+                }
+
+                100% {
+                    height: 0;
+                }
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="container curtain-opening">
+            <h1>Cinema Ticket Generator</h1>
+        
+            <label for="movieChoice">Select a Movie:</label>
+        
+            <select id="movieChoice">
+                <option value="movie">-- Pick a Movie Here --</option>
+                <option value="movieOne">Shazam 2 - PhP 500.00 at Cinema I</option>
+                <option value="movieTwo">The Batman - PhP 475.00 at Cinema Jr.</option>
+                <option value="movieThree">Man of Steel - PhP 520.00 at Cinema Sr.</option>
+            </select>
+        
+            <button onclick="generateTicket()">Generate Ticket</button>
+        
+            <button onclick="resetForm()">Reset</button>
+        
+            <div id="ticketContainer"></div>
+        </div>
+
+        <script>
+            //  Queue implementation for seat numbers. (I Haven't perfected this one yet, hehe)
+            //  It seems like hindi po sya nakakapag-assign ng proper seat until maubos yung 100 seats.
+            //  Maybe because wala pa pong memory included and database?
+            class Queue {
+                constructor() {
+                    this.items = [];
+                }
+
+                enqueue(item) {
+                    this.items.push(item);
+                }
+
+                dequeue() {
+                    if (this.isEmpty()) {
+                        return "Queue is empty";
+                    }
+                    return this.items.shift();
+                }
+
+                front() {
+                    if (this.isEmpty()) {
+                        return "Queue is empty";
+                    }
+                    return this.items[0];
+                }
+
+                isEmpty() {
+                    return this.items.length === 0;
+                }
+            }
+
+            //  Define movie prices and cinema names.
+            const movieDetails = {
+                movieOne: { price: 500.00, cinema: "Cinema I - Shazam 2" },
+                movieTwo: { price: 475.00, cinema: "Cinema Jr. - The Batman" },
+                movieThree: { price: 520.00, cinema: "Cinema Sr. - Man of Steel" }
+            };
+
+            //  Function to generate a cinema ticket.
+            function generateTicket() {
+                const movieChoice = document.getElementById("movieChoice");
+                const chosenMovie = movieChoice.value;
+                const { price, cinema } = movieDetails[chosenMovie];
+
+                //  Creating a queue for seat numbers.
+                const seatQueue = new Queue();
+
+                //  Generating seat numbers (assuming 100 seats for each cinema).
+                for (let i = 1; i <= 100; i++) {
+                    seatQueue.enqueue(i);
+                }
+
+                //  Dequeue the seat number for the user.
+                seatQueue.dequeue();
+
+                //  Display the generated ticket.
+                const ticketContainer = document.getElementById("ticketContainer");
+                ticketContainer.innerHTML = `
+                    <h2>Ticket Details</h2>
+                    <p>Mall Name: <strong>SM Naga City</strong></p>
+                    <p>Ticket No.: <strong>${generateTicketNumber()}</strong></p>
+                    <p>Cinema: <strong>${cinema}</strong></p>
+                    <p>Watch Price: <strong>PhP ${price.toFixed(2)}</strong></p>
+                `;
+            }
+
+            //  Function to reset the form with curtain opening effect.
+            function resetForm() {
+                //  Add the curtain-opening class to the container for the animation.
+                const container = document.querySelector('.container');
+                container.classList.add('curtain-opening');
+                
+                //  Clear the generated ticket details after a short delay.
+                setTimeout(() => {
+                    const ticketContainer = document.getElementById("ticketContainer");
+                    ticketContainer.innerHTML = '';
+                    
+                    //  Reset the movie selection.
+                    const movieChoice = document.getElementById("movieChoice");
+                    movieChoice.selectedIndex = 0;
+
+                    //  Remove the curtain-opening class to reset the animation.
+                    container.classList.remove('curtain-opening');
+
+                    //  Clear the ticket price display.
+                    const ticketPriceContainer = document.getElementById("ticketPrice");
+                    ticketPriceContainer.innerHTML = '';
+                }, 500); // Animation duration is 0.5 seconds.
+            }
+
+            //  Function to generate a random ticket number
+            function generateTicketNumber() {
+                return Math.floor(Math.random() * 1000000) + 1;
+            }
+        </script>
+    </body>
+</html>
